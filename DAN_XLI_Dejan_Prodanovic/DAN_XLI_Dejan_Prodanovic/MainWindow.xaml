@@ -7,6 +7,52 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="1" Grid.Row="3" Name="lblNumberOfCopies" Content="Broj kopija:"
+               Padding="0" HorizontalAlignment="Right"/>
+
+        <TextBox Grid.Column="3" Grid.Row="1" Name="txtToPrint" Height="100" Width="200" 
+                 Text="{Binding TextToPrint, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Column="3" Grid.Row="3" Name="txtNumberOfCopies" Height="20" Width="200" 
+                 Text="{Binding NumberOfCopies, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <ProgressBar Grid.Column="3" Grid.Row="5"  Minimum="0" Maximum="100"
+                     Value="{Binding CurrentProgress, Mode=OneWay}" Height="20" Width="200" Name="pbStatus" />
+
+        <Label Grid.Column="5" Grid.Row="5" Name="lblPercentage" Content="{Binding Percentage}"
+               Padding="0" HorizontalAlignment="Right"/>
+
+        <Button Grid.Column="3" Grid.Row="17" Name="btnSave" Content="Stampaj" Height="20" Width="70" 
+                HorizontalAlignment="Left"
+                Command="{Binding Print, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Column="3" Grid.Row="17" Name="btnClose" Content="Prekid stampanja" Height="20"
+                Width="100" HorizontalAlignment="Right"
+                Command="{Binding StopPrinting, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </Window>

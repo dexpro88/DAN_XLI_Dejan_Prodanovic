@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAN_XLI_Dejan_Prodanovic.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace DAN_XLI_Dejan_Prodanovic
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new MainWindowViewModel(this);
         }
     }
 }
