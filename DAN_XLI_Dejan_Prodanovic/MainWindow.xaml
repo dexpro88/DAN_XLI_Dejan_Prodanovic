@@ -50,6 +50,6 @@
         <Button Grid.Column="3" Grid.Row="17" Name="btnSave" Content="Stampaj" Height="20" Width="70" HorizontalAlignment="Left"
                 Command="{Binding Print, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Grid.Column="3" Grid.Row="17" Name="btnClose" Content="Prekid stampanja" Height="20" Width="100" HorizontalAlignment="Right"
-                Command="{Binding Close, UpdateSourceTrigger=PropertyChanged}"/>
+                Command="{Binding StopPrinting, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </Window>
