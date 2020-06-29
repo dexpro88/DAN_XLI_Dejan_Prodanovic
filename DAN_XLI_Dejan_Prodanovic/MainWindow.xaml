@@ -1,0 +1,57 @@
+﻿<Window x:Class="DAN_XLI_Dejan_Prodanovic.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DAN_XLI_Dejan_Prodanovic"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="6"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="1" Grid.Row="3" Name="lblNumberOfCopies" Content="Broj kopija:" Padding="0" HorizontalAlignment="Right"/>
+        <!--<Label Grid.Column="1" Grid.Row="5" Name="lblJMBG" Content="JMBG:" Padding="0" HorizontalAlignment="Right"/>
+        <Label Grid.Column="1" Grid.Row="7" Name="lblPublisher" Content="Publisher:" Padding="0" HorizontalAlignment="Right"/>-->
+        <TextBox Grid.Column="3" Grid.Row="1" Name="txtFirstName" Height="100" Width="200" 
+                 Text="{Binding IdCard.FirstName, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Column="3" Grid.Row="3" Name="txtNumberOfCopies" Height="20" Width="200" 
+                 Text="{Binding IdCard.LastName, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <ProgressBar Grid.Column="3" Grid.Row="5"  Minimum="0" Maximum="100" Height="20" Width="200" Name="pbStatus" />
+        <!--<TextBox Grid.Column="3" Grid.Row="5" Name="txtJMBG" Height="20" Width="200" 
+                 Text="{Binding IdCard.JMBG, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Column="3" Grid.Row="7" Name="txtPlace" Height="20" Width="200"
+                 Text="{Binding IdCard.Publisher, UpdateSourceTrigger=PropertyChanged}"/>-->
+
+
+        <Button Grid.Column="3" Grid.Row="17" Name="btnSave" Content="Stampaj" Height="20" Width="70" HorizontalAlignment="Left"
+                Command="{Binding Save, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Column="3" Grid.Row="17" Name="btnClose" Content="Prekid stampanja" Height="20" Width="100" HorizontalAlignment="Right"
+                Command="{Binding Close, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</Window>
