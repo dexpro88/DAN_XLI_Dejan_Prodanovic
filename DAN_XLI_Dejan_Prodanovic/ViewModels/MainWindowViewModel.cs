@@ -15,11 +15,13 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 {
     class MainWindowViewModel : ViewModelBase
     {      
-        private static bool _isRunning;
-        int copiesCounter = 0;
+        //private static bool _isRunning;
+        //int copiesCounter = 0;
         private string _buttonLabel;
         private int currentProgress;
         private BackgroundWorker worker = new BackgroundWorker();
+        private bool firstPrinting = true;
+       
         MainWindow main;
 
         public MainWindowViewModel(MainWindow mainOpen)
@@ -31,7 +33,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             worker.WorkerSupportsCancellation = true;
             worker.RunWorkerCompleted += RunWorkerCompleted;
             CurrentProgress = 0;
-            _isRunning = false;
+            //_isRunning = false;
 
             if (Directory.Exists("../../PrintedCopies"))
             {
@@ -69,6 +71,33 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 OnPropertyChanged("NumberOfCopies");
             }
         }
+
+        public int CurrentProgress
+        {
+            get { return currentProgress; }
+            private set
+            {
+                if (currentProgress != value)
+                {
+                    currentProgress = value;
+                    OnPropertyChanged("CurrentProgress");
+                }
+            }
+        }
+
+        public string ButtonLabel
+        {
+            get { return _buttonLabel; }
+            private set
+            {
+                if (_buttonLabel != value)
+                {
+                    _buttonLabel = value;
+                    OnPropertyChanged("ButtonLabel");
+                }
+            }
+        }
+
         #endregion  
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -78,34 +107,38 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
-            if (CurrentProgress >= 100)
-            {
-                CurrentProgress = 0;
-            }
+            int copiesCounter = 0;
+            
+            CurrentProgress = 0;
+            //MessageBox.Show(numberOfCopies);
+                  
            
-            while (CurrentProgress < 100 && _isRunning)
+            while (copiesCounter < Int32.Parse(numberOfCopies))
             {
-                if (worker.CancellationPending)
-                {
-                    e.Cancel = true;
-                    return;
-                }
+                
                 worker.ReportProgress(CurrentProgress);
                 //CurrentProgress++;
                 DateTime today = DateTime.Now;
                 string filePath = String.Format("../../PrintedCopies/{0}.{1}_{2}_{3}_{4}_{5}.txt", (copiesCounter + 1),
                     today.Day, today.Month, today.Year, today.Hour, today.Minute);
 
-                FileActions.WriteToFile(filePath, TextToPrint);
+                FileActions.WriteToFile(filePath, TextToPrint);              
+                
+                Thread.Sleep(1000);
+
                 copiesCounter++;
                 double curProgDouble = (copiesCounter / Double.Parse(numberOfCopies)) * 100;
                 CurrentProgress = (int)curProgDouble;
-                //MessageBox.Show(curProgDouble.ToString());
-                Thread.Sleep(1000);
                
-            }
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
 
-            _isRunning = false;
+            }
+             
+             
         }
 
         static void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -148,15 +181,15 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                     return;
                 }
 
-                if (_isRunning)
+                if (worker.IsBusy)
                 {
                     MessageBox.Show("Stampanje je vec u toku.");
                     return;
                 }
-                _isRunning = true;
-                //_isRunningHelpVar = true;
+                
+                firstPrinting = false;
 
-                if (_isRunning)
+                if (!worker.IsBusy)
                 {
                     DoStuff();
                 }
@@ -197,15 +230,17 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
         {
             try
             {       
-                _isRunning = !_isRunning;
+                 
                 if (worker.IsBusy) worker.CancelAsync();
-               
+
+                //CurrentProgress = 0;
+                 
 
                 if (Directory.Exists("../../PrintedCopies"))
                 {
                     Directory.Delete("../../PrintedCopies", true);
                 }
-
+               
             }
             catch (Exception ex)
             {
@@ -215,7 +250,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 
         private bool CanStopPrintingxecute()
         {
-            if (!_isRunning)
+            if (!worker.IsBusy)
             {
                 return false;
             }
@@ -225,36 +260,15 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             }
         }  
 
-        public int CurrentProgress
-        {
-            get { return currentProgress; }
-            private set
-            {
-                if (currentProgress != value)
-                {
-                    currentProgress = value;
-                    OnPropertyChanged("CurrentProgress");
-                }
-            }
-        }
-
-        public string ButtonLabel
-        {
-            get { return _buttonLabel; }
-            private set
-            {
-                if (_buttonLabel != value)
-                {
-                    _buttonLabel = value;
-                    OnPropertyChanged("ButtonLabel");
-                }
-            }
-        }
-
+  
         private void DoStuff()
         {
-           
+            if (!firstPrinting)
+            {
+                Directory.CreateDirectory("../../PrintedCopies");
+            }
             worker.RunWorkerAsync();
+           
         }
     }
 }
