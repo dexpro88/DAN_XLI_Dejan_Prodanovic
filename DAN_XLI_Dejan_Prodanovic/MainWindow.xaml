@@ -34,9 +34,9 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="1" Grid.Row="3" Name="lblNumberOfCopies" Content="Broj kopija:" Padding="0" HorizontalAlignment="Right"/>
-        <!--<Label Grid.Column="1" Grid.Row="5" Name="lblJMBG" Content="JMBG:" Padding="0" HorizontalAlignment="Right"/>
-        <Label Grid.Column="1" Grid.Row="7" Name="lblPublisher" Content="Publisher:" Padding="0" HorizontalAlignment="Right"/>-->
+        <Label Grid.Column="1" Grid.Row="3" Name="lblNumberOfCopies" Content="Broj kopija:"
+               Padding="0" HorizontalAlignment="Right"/>
+       
         <TextBox Grid.Column="3" Grid.Row="1" Name="txtToPrint" Height="100" Width="200" 
                  Text="{Binding TextToPrint, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBox Grid.Column="3" Grid.Row="3" Name="txtNumberOfCopies" Height="20" Width="200" 
@@ -44,8 +44,9 @@
 
         <ProgressBar Grid.Column="3" Grid.Row="5"  Minimum="0" Maximum="100"
                      Value="{Binding CurrentProgress, Mode=OneWay}" Height="20" Width="200" Name="pbStatus" />
-         
 
+        <Label Grid.Column="5" Grid.Row="5" Name="lblPercentage" Content="{Binding Percentage}"
+               Padding="0" HorizontalAlignment="Right"/>
 
         <Button Grid.Column="3" Grid.Row="17" Name="btnSave" Content="Stampaj" Height="20" Width="70" HorizontalAlignment="Left"
                 Command="{Binding Print, UpdateSourceTrigger=PropertyChanged}"/>

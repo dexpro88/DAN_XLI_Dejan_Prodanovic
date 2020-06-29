@@ -15,8 +15,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 {
     class MainWindowViewModel : ViewModelBase
     {      
-        //private static bool _isRunning;
-        //int copiesCounter = 0;
+       
         private string _buttonLabel;
         private int currentProgress;
         private BackgroundWorker worker = new BackgroundWorker();
@@ -33,7 +32,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             worker.WorkerSupportsCancellation = true;
             worker.RunWorkerCompleted += RunWorkerCompleted;
             CurrentProgress = 0;
-            //_isRunning = false;
+            
 
             if (Directory.Exists("../../PrintedCopies"))
             {
@@ -44,6 +43,9 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
         }
 
         #region Properties
+        /// <summary>
+        /// text that we will print , it is binded to a textbox 
+        /// </summary>
         private string textToPrint;
         public string TextToPrint
         {
@@ -58,6 +60,10 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             }
         }
 
+        /// <summary>
+        /// number of coppies that we want to print to a file
+        /// it si binded to a textbox
+        /// </summary>
         private string numberOfCopies;
         public string NumberOfCopies
         {
@@ -71,7 +77,27 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 OnPropertyChanged("NumberOfCopies");
             }
         }
+        /// <summary>
+        /// percentage of files in which text has already been written
+        /// it is binded to a label lblPercentage
+        /// </summary>
+        private string percentage;
+        public string Percentage
+        {
+            get
+            {
+                return percentage;
+            }
+            set
+            {
+                percentage = value;
+                OnPropertyChanged("Percentage");
+            }
+        }
 
+        /// <summary>
+        /// current progress of writing to files
+        /// </summary>
         public int CurrentProgress
         {
             get { return currentProgress; }
@@ -110,14 +136,15 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             int copiesCounter = 0;
             
             CurrentProgress = 0;
-            //MessageBox.Show(numberOfCopies);
-                  
-           
-            while (copiesCounter < Int32.Parse(numberOfCopies))
+            
+            int wantedNumberOfCoppies = Int32.Parse(numberOfCopies);
+
+            while (copiesCounter < wantedNumberOfCoppies)
             {
                 
                 worker.ReportProgress(CurrentProgress);
-                //CurrentProgress++;
+                 
+                //we format a path and a name for file
                 DateTime today = DateTime.Now;
                 string filePath = String.Format("../../PrintedCopies/{0}.{1}_{2}_{3}_{4}_{5}.txt", (copiesCounter + 1),
                     today.Day, today.Month, today.Year, today.Hour, today.Minute);
@@ -127,8 +154,14 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 Thread.Sleep(1000);
 
                 copiesCounter++;
-                double curProgDouble = (copiesCounter / Double.Parse(numberOfCopies)) * 100;
+
+                //we count current percentage of files in which text is alredy written
+                double curProgDouble = (copiesCounter /(double) wantedNumberOfCoppies) * 100;
                 CurrentProgress = (int)curProgDouble;
+
+                //we format perctentage for label where it will be displayed
+                Percentage = ((int)curProgDouble).ToString()+"%";
+                 
                
                 if (worker.CancellationPending)
                 {
@@ -141,6 +174,11 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
              
         }
 
+        /// <summary>
+        /// method that is executed when BackgroundWorker is completed or canceled
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         static void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)
@@ -152,6 +190,9 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
               
         }
 
+        /// <summary>
+        /// command that is called when we click on buttno Stampaj
+        /// </summary>
         private ICommand print;
         public ICommand Print
         {
@@ -164,23 +205,25 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 return print;
             }
         }
-
+         
         private void PrintExecute()
         {
             try
             {
+                //we check if user enter valid value for number of coppies
                 if (!ValidationClass.NumberOfCoppiesIsValid(numberOfCopies))
                 {
-                    MessageBox.Show("Morate uneti ceo broj za broj kopija.");
+                    MessageBox.Show("Morate uneti pozitivan ceo broj manji od 100.");
                     return;
                 }
-
+                //we check if user enter valid value for number of coppies
                 if (Int32.Parse(numberOfCopies)<=0 || Int32.Parse(numberOfCopies)>=100)
                 {
                     MessageBox.Show("Morate uneti pozitivan ceo broj manji od 100.");
                     return;
                 }
-
+                //if the Background is running we cant call Print commad 
+                //program will print a message to user and command will end here
                 if (worker.IsBusy)
                 {
                     MessageBox.Show("Stampanje je vec u toku.");
@@ -191,6 +234,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 
                 if (!worker.IsBusy)
                 {
+                    //this method call DoWork method of Background Worker
                     DoStuff();
                 }
                 
@@ -203,6 +247,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 
         private bool CanPrintExecute()
         {
+            //button Stampaj is available if there is text in a textboxs TextToPrint and NumberOfCopies
             if (String.IsNullOrWhiteSpace(TextToPrint) || String.IsNullOrWhiteSpace(NumberOfCopies))
             {
                 return false;
@@ -212,7 +257,9 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 return true;
             }
         }
-
+        /// <summary>
+        /// command that is executed when user press button Prekid stampanja
+        /// </summary>
         private ICommand stopPrinting;
         public ICommand StopPrinting
         {
@@ -232,10 +279,8 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             {       
                  
                 if (worker.IsBusy) worker.CancelAsync();
-
-                //CurrentProgress = 0;
-                 
-
+                
+                //we delete folder in which we store files in which we print the text
                 if (Directory.Exists("../../PrintedCopies"))
                 {
                     Directory.Delete("../../PrintedCopies", true);
@@ -250,6 +295,9 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
 
         private bool CanStopPrintingxecute()
         {
+            //user can press button Prekid stampanja only if BackgroundWorker is running 
+            //(while printing is being performed)
+            
             if (!worker.IsBusy)
             {
                 return false;
@@ -263,6 +311,8 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
   
         private void DoStuff()
         {
+            //if it is not the first printing  after program is started we have to create folder for storing
+            //files in which we will print text from the text box
             if (!firstPrinting)
             {
                 Directory.CreateDirectory("../../PrintedCopies");
