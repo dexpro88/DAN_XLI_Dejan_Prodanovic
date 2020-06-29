@@ -3,6 +3,7 @@ using DAN_XLI_Dejan_Prodanovic.Validations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,11 +16,9 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
     class MainWindowViewModel : ViewModelBase
     {      
         private static bool _isRunning;
-        //private static bool _isRunningHelpVar;
         int copiesCounter = 0;
         private string _buttonLabel;
         private int currentProgress;
-        //private ICommand _command;
         private BackgroundWorker worker = new BackgroundWorker();
         MainWindow main;
 
@@ -30,9 +29,16 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             worker.ProgressChanged += ProgressChanged;
             worker.WorkerReportsProgress = true;
             worker.WorkerSupportsCancellation = true;
+            worker.RunWorkerCompleted += RunWorkerCompleted;
             CurrentProgress = 0;
             _isRunning = false;
-          
+
+            if (Directory.Exists("../../PrintedCopies"))
+            {
+                Directory.Delete("../../PrintedCopies", true);
+            }
+            Directory.CreateDirectory("../../PrintedCopies");
+
         }
 
         #region Properties
@@ -76,21 +82,43 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             {
                 CurrentProgress = 0;
             }
-
+           
             while (CurrentProgress < 100 && _isRunning)
             {
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
                 worker.ReportProgress(CurrentProgress);
-                Thread.Sleep(1000);
                 //CurrentProgress++;
+                DateTime today = DateTime.Now;
+                string filePath = String.Format("../../PrintedCopies/{0}.{1}_{2}_{3}_{4}_{5}.txt", (copiesCounter + 1),
+                    today.Day, today.Month, today.Year, today.Hour, today.Minute);
+
+                FileActions.WriteToFile(filePath, TextToPrint);
                 copiesCounter++;
                 double curProgDouble = (copiesCounter / Double.Parse(numberOfCopies)) * 100;
                 CurrentProgress = (int)curProgDouble;
                 //MessageBox.Show(curProgDouble.ToString());
+                Thread.Sleep(1000);
+               
             }
 
             _isRunning = false;
         }
-  
+
+        static void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+                MessageBox.Show("Ponistili ste stampanje");
+            else if (e.Error != null)
+                Console.WriteLine("Printer exception " + e.Error.ToString());
+            else
+                MessageBox.Show("Stampanje je zavrseno"+e.Result);
+              
+        }
+
         private ICommand print;
         public ICommand Print
         {
@@ -111,6 +139,12 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
                 if (!ValidationClass.NumberOfCoppiesIsValid(numberOfCopies))
                 {
                     MessageBox.Show("Morate uneti ceo broj za broj kopija.");
+                    return;
+                }
+
+                if (Int32.Parse(numberOfCopies)<=0 || Int32.Parse(numberOfCopies)>=100)
+                {
+                    MessageBox.Show("Morate uneti pozitivan ceo broj manji od 100.");
                     return;
                 }
 
@@ -163,7 +197,15 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
         {
             try
             {       
-                _isRunning = !_isRunning;          
+                _isRunning = !_isRunning;
+                if (worker.IsBusy) worker.CancelAsync();
+               
+
+                if (Directory.Exists("../../PrintedCopies"))
+                {
+                    Directory.Delete("../../PrintedCopies", true);
+                }
+
             }
             catch (Exception ex)
             {
@@ -181,27 +223,7 @@ namespace DAN_XLI_Dejan_Prodanovic.ViewModels
             {
                 return true;
             }
-        }
-
-        //public ICommand Command
-        //{
-        //    get
-        //    {
-        //        return _command ?? (_command = new RelayCommand(x =>
-        //        {
-        //            _isRunning = !_isRunning;
-
-        //            if (!_isRunning)
-        //            {
-        //                DoStuff();
-        //            }
-        //            else
-        //            {
-        //                ButtonLabel = "PAUSED";
-        //            }
-        //        }));
-        //    }
-        //}
+        }  
 
         public int CurrentProgress
         {

@@ -9,9 +9,9 @@ namespace DAN_XLI_Dejan_Prodanovic
 {
     class FileActions
     {
-        public static void WriteToFile(string fileName, string textToWriteToFile)
+        public static void WriteToFile(string filePath, string textToWriteToFile)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter(filePath))
             {
                 
                     sw.WriteLine(textToWriteToFile);
